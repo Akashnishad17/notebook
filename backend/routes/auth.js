@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET_KEY = 'AKASHNISHAD_IS_A_GOOD_CODER';
 
 router.post('/createuser', 
     [
@@ -21,13 +25,23 @@ router.post('/createuser',
                 return res.status(400).json({errors: 'User with this email already exists.'});
             }
 
+            const salt = await bcrypt.genSalt(10);
+            const securePassword = await bcrypt.hash(req.body.password, salt);
+
             const user = await User.create({
                 name: req.body.name,
                 email: req.body.email,
-                password: req.body.password
+                password: securePassword
             });
 
-            res.json(user);
+            const data = {
+                user: {
+                    id: user.id
+                }
+            };
+            
+            const token = jwt.sign(data, JWT_SECRET_KEY);
+            res.json(token);
         } catch(error) {
             console.error(error.message);
             res.status(500).send("Internal Server Error");
