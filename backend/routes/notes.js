@@ -1,8 +1,47 @@
 const express = require('express');
 const router = express.Router();
+const getUser = require('../middleware/getuser');
+const Notes = require('../models/Notes');
+const { body, validationResult } = require('express-validator');
 
-router.get('/', (req, res) => {
-    res.json([]);
-});
+router.get('/getnotes', getUser, 
+    async(req, res) => {
+        try{
+            const notes = await Notes.find({user: req.user.id});
+            res.json(notes);
+        }catch(error){
+            console.error(error.message);
+            res.status(500).send('Internal Server Error');
+        }
+    }
+);
+
+router.post('/addnote', getUser, 
+    [
+        body('title', 'Enter a valid title').isLength({min: 3}),
+        body('description', 'Description must be at least 5 characters').isLength({min: 5})
+    ],
+    async(req, res) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({errors: errors.array()});
+        }
+
+        try{
+            const note = await Notes.create({
+                user: req.user.id,
+                title: req.body.title,
+                description: req.body.description,
+                tag: req.body.tag
+            });
+    
+            res.json(note);
+        }catch(error){
+            console.error(error.message);
+            res.status(500).send('Internal Server Error');
+        }
+        
+    }
+);
 
 module.exports = router;
