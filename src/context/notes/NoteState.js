@@ -60,10 +60,17 @@ const NoteState = (props) => {
             }
         );
         const note = await response.json();
-        const element = notes.filter(note => note._id === id)[0];
-        element.title = note.title;
-        element.description = note.description;
-        element.tag = note.tag;
+        let clonedNotes = JSON.parse(JSON.stringify(notes));
+        
+        for(let i = 0; i < clonedNotes.length; i++) {
+            if(note._id === clonedNotes[i]._id) {
+                clonedNotes[i].title = note.title;
+                clonedNotes[i].description = note.description;
+                clonedNotes[i].tag = note.tag;
+                break;
+            }
+        }
+        setNotes(clonedNotes);
     };
 
     return (

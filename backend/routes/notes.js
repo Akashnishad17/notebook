@@ -61,7 +61,7 @@ router.put('/updatenote/:id', getUser,
 
             if(title) {updatedNote.title = title;}
             if(description) {updatedNote.description = description;}
-            if(tag) {updatedNote.description = tag;}
+            if(tag) {updatedNote.tag = tag;}
 
             const existingNote = await Notes.findById(req.params.id);
 
