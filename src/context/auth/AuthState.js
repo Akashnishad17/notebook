@@ -22,7 +22,7 @@ const AuthState = (props) => {
         if(json.success) {
             localStorage.setItem('token', json.token);
             navigate("/");
-            showAlert('success', 'Login Successful');
+            showAlert('success', 'Logged in Successfully');
         } else {
             showAlert('danger', 'Please enter correct email and password');
         }
@@ -43,7 +43,7 @@ const AuthState = (props) => {
         if(json.success) {
             localStorage.setItem('token', json.token);
             navigate("/");
-            showAlert('success', 'Login Successful');
+            showAlert('success', 'Logged in Successfully');
         } else {
             showAlert('danger', 'Unable to create user');
         }

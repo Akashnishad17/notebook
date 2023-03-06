@@ -4,6 +4,7 @@ import NoteContext from "./noteContext";
 const NoteState = (props) => {
     const HOST = 'http://localhost:5000';
     const [notes, setNotes] = useState([]);
+    const {showAlert} = props;
 
     const getNotes = async() => {
         const response = await fetch(`${HOST}/api/notes/getnotes`,
@@ -37,6 +38,9 @@ const NoteState = (props) => {
 
         if(json.success) {
             setNotes(notes.concat(json.note));
+            showAlert('success', 'Note Added successfully');
+        } else {
+            showAlert('danger', 'Unable to add Note');
         }
     };
 
@@ -54,6 +58,9 @@ const NoteState = (props) => {
 
         if(json.success) {
             setNotes(notes.filter(note => note._id !== id));
+            showAlert('success', 'Note Deleted Successfully');
+        } else {
+            showAlert('danger', 'Unable to delete Note');
         }
     };
     
@@ -82,6 +89,9 @@ const NoteState = (props) => {
                 }
             }
             setNotes(clonedNotes);
+            showAlert('success', 'Note Updated Successfully');
+        } else {
+            showAlert('danger', 'Unable to update Note');
         }
     };
 
