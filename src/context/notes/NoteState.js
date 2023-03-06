@@ -11,12 +11,15 @@ const NoteState = (props) => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQwMzc5MjRhOGM0OTQyNjE0MTUzMjE0In0sImlhdCI6MTY3Nzk5OTE0N30.bpuRL9hhsem2v0M-iiNt1zGjdejuHEaUu85OcoEBAhM'
+                    'token': localStorage.getItem('token')
                 }
             }
         );
-        const notes = await response.json();
-        setNotes(notes);
+        const json = await response.json();
+
+        if(json.success) {
+            setNotes(json.notes);
+        }
     };
 
     const addNote = async(title, description, tag) => {
@@ -25,13 +28,16 @@ const NoteState = (props) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQwMzc5MjRhOGM0OTQyNjE0MTUzMjE0In0sImlhdCI6MTY3Nzk5OTE0N30.bpuRL9hhsem2v0M-iiNt1zGjdejuHEaUu85OcoEBAhM'
+                    'token': localStorage.getItem('token')
                 },
                 body: JSON.stringify({title, description, tag})
             }
         );
-        const note = await response.json();
-        setNotes(notes.concat(note));
+        const json = await response.json();
+
+        if(json.success) {
+            setNotes(notes.concat(json.note));
+        }
     };
 
     const deleteNote = async(id) => {
@@ -40,12 +46,15 @@ const NoteState = (props) => {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQwMzc5MjRhOGM0OTQyNjE0MTUzMjE0In0sImlhdCI6MTY3Nzk5OTE0N30.bpuRL9hhsem2v0M-iiNt1zGjdejuHEaUu85OcoEBAhM'
+                    'token': localStorage.getItem('token')
                 }
             }
         );
-        await response.json();
-        setNotes(notes.filter(note => note._id !== id));
+        const json = await response.json();
+
+        if(json.success) {
+            setNotes(notes.filter(note => note._id !== id));
+        }
     };
     
     const updateNote = async(id, title, description, tag) => {
@@ -54,23 +63,26 @@ const NoteState = (props) => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQwMzc5MjRhOGM0OTQyNjE0MTUzMjE0In0sImlhdCI6MTY3Nzk5OTE0N30.bpuRL9hhsem2v0M-iiNt1zGjdejuHEaUu85OcoEBAhM'
+                    'token': localStorage.getItem('token')
                 },
                 body: JSON.stringify({title, description, tag})
             }
         );
-        const note = await response.json();
-        let clonedNotes = JSON.parse(JSON.stringify(notes));
-        
-        for(let i = 0; i < clonedNotes.length; i++) {
-            if(note._id === clonedNotes[i]._id) {
-                clonedNotes[i].title = note.title;
-                clonedNotes[i].description = note.description;
-                clonedNotes[i].tag = note.tag;
-                break;
+        const json = await response.json();
+
+        if(json.success) {
+            let clonedNotes = JSON.parse(JSON.stringify(notes));
+            
+            for(let i = 0; i < clonedNotes.length; i++) {
+                if(json.note._id === clonedNotes[i]._id) {
+                    clonedNotes[i].title = json.note.title;
+                    clonedNotes[i].description = json.note.description;
+                    clonedNotes[i].tag = json.note.tag;
+                    break;
+                }
             }
+            setNotes(clonedNotes);
         }
-        setNotes(clonedNotes);
     };
 
     return (

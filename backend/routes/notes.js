@@ -8,10 +8,10 @@ router.get('/getnotes', getUser,
     async(req, res) => {
         try{
             const notes = await Notes.find({user: req.user.id});
-            res.json(notes);
+            res.json({success: true, notes: notes});
         }catch(error){
             console.error(error.message);
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({success: false, errors: 'Internal Server Error'});;
         }
     }
 );
@@ -24,7 +24,7 @@ router.post('/addnote', getUser,
     async(req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({errors: errors.array()});
+            return res.status(400).json({success: false, errors: errors.array()});
         }
 
         try{
@@ -35,10 +35,10 @@ router.post('/addnote', getUser,
                 tag: req.body.tag
             });
     
-            res.json(note);
+            res.json({success: true, note: note});
         }catch(error){
             console.error(error.message);
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({success: false, errors: 'Internal Server Error'});
         }
         
     }
@@ -52,7 +52,7 @@ router.put('/updatenote/:id', getUser,
     async(req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({errors: errors.array()});
+            return res.status(400).json({success: false, errors: errors.array()});
         }
 
         try{
@@ -66,18 +66,18 @@ router.put('/updatenote/:id', getUser,
             const existingNote = await Notes.findById(req.params.id);
 
             if(!existingNote) {
-                return res.status(400).json({errors: 'Not Found'});
+                return res.status(400).json({success: false, errors: 'Not Found'});
             }
 
             if(existingNote.user.toString() !== req.user.id){
-                return res.status(401).json({errors: 'Not Allowed'});
+                return res.status(401).json({success: false, errors: 'Not Allowed'});
             }
 
             const note = await Notes.findByIdAndUpdate(req.params.id, {$set: updatedNote}, {new: true});
-            res.json(note);
+            res.json({success: true, note: note});
         }catch(error){
             console.error(error.message);
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({success: false, errors: 'Internal Server Error'});;
         }
     }
 );
@@ -86,25 +86,25 @@ router.delete('/deletenote/:id', getUser,
     async(req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({errors: errors.array()});
+            return res.status(400).json({success: false, errors: errors.array()});
         }
 
         try{
             const existingNote = await Notes.findById(req.params.id);
 
             if(!existingNote) {
-                return res.status(400).json({errors: 'Not Found'});
+                return res.status(400).json({success: false, errors: 'Not Found'});
             }
 
             if(existingNote.user.toString() !== req.user.id){
-                return res.status(401).json({errors: 'Not Allowed'});
+                return res.status(401).json({success: false, errors: 'Not Allowed'});
             }
 
             const note = await Notes.findByIdAndDelete(req.params.id);
-            res.json({success: `Note with id: ${req.params.id} has been deleted`, note: note});
+            res.json({success: true});
         }catch(error){
             console.error(error.message);
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({success: false, errors: 'Internal Server Error'});
         }
     }
 );

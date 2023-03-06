@@ -17,13 +17,13 @@ router.post('/createuser',
     async(req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({errors: errors.array()});
+            return res.status(400).json({success: false, errors: errors.array()});
         }
 
         try {
             const existingUser = await User.findOne({email : req.body.email});
             if(existingUser){
-                return res.status(400).json({errors: 'User with this email already exists'});
+                return res.status(400).json({success: false, errors: 'User with this email already exists'});
             }
 
             const salt = await bcrypt.genSalt(10);
@@ -42,10 +42,10 @@ router.post('/createuser',
             };
 
             const token = jwt.sign(data, JWT_SECRET_KEY);
-            res.json(token);
+            res.json({success: true, token: token});
         } catch(error) {
             console.error(error.message);
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({success: false, errors: 'Internal Server Error'});
         }
     }
 );
@@ -58,7 +58,7 @@ router.post('/login',
     async(req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({errors: errors.array()});
+            return res.status(400).json({success: false, errors: errors.array()});
         }
         
         try{
@@ -66,12 +66,12 @@ router.post('/login',
             const user = await User.findOne({email: email});
 
             if(!user){
-                return res.status(400).json({errors: 'Please enter correct email and password'});
+                return res.status(400).json({success: false, errors: 'Please enter correct email and password'});
             }
 
             const isCorrectPassword = await bcrypt.compare(password, user.password);
             if(!isCorrectPassword){
-                return res.status(400).json({errors: 'Please enter correct email and password'});
+                return res.status(400).json({success: false, errors: 'Please enter correct email and password'});
             }
 
             const data = {
@@ -81,10 +81,10 @@ router.post('/login',
             };
 
             const token = jwt.sign(data, JWT_SECRET_KEY);
-            res.json({token: token});
+            res.json({success: true, token: token});
         }catch(error){
             console.error(error.message);
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({success: false, errors: 'Internal Server Error'});
         }
     }
 );
@@ -93,10 +93,10 @@ router.post('/getuser', getUser,
     async(req, res) => {
         try{
             const user = await User.findById(req.user.id).select('-password');
-            res.send(user);
+            res.send({success: true, user: user});
         }catch(error){
             console.error(error.message);
-            res.status(500).send('Internal Server Error');
+            res.status(500).json({success: false, errors: 'Internal Server Error'});
         }
     }
 );

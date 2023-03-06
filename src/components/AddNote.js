@@ -2,13 +2,15 @@ import React, { useState, useContext } from 'react';
 import NoteContext from '../context/notes/noteContext';
 
 const AddNote = () => {
+    const initialNote = {title: '', description: '', tag: ''};
     const noteContext = useContext(NoteContext);
     const {addNote} = noteContext;
-    const [note, setNote] = useState({title: '', description: '', tag: 'General'});
+    const [note, setNote] = useState(initialNote);
 
     const handleClick = (event) => {
         event.preventDefault();
         addNote(note.title, note.description, note.tag);
+        setNote(initialNote)
     };
 
     const handleChange = (event) => {
@@ -22,17 +24,17 @@ const AddNote = () => {
                 <form>
                     <div className="mb-3">
                         <label htmlFor="title" className="form-label">Title</label>
-                        <input type="text" className="form-control" id="title" name="title" aria-describedby="emailHelp" onChange={handleChange} />
+                        <input type="text" className="form-control" id="title" name="title" aria-describedby="emailHelp" onChange={handleChange} value={note.title} minLength={3} required />
                     </div>
                     <div className="mb-3">
                         <label htmlFor="description" className="form-label">Description</label>
-                        <input type="text" className="form-control" id="description" name="description" onChange={handleChange} />
+                        <input type="text" className="form-control" id="description" name="description" onChange={handleChange} value={note.description} minLength={5} required />
                     </div>
                     <div className="mb-3">
                         <label htmlFor="tag" className="form-label">Tag</label>
-                        <input type="text" className="form-control" id="tag" name="tag" onChange={handleChange} />
+                        <input type="text" className="form-control" id="tag" name="tag" onChange={handleChange} value={note.tag} />
                     </div>
-                    <button type="submit" className="btn btn-primary" onClick={handleClick}>Add</button>
+                    <button disabled={note.title.length < 3 || note.description.length < 5} type="submit" className="btn btn-primary" onClick={handleClick}>Add</button>
                 </form>
             </div>
         </>
